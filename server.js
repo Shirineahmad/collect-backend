@@ -1,7 +1,12 @@
 require('dotenv').config();
+const { initializeApp } = require('firebase/app');
+const firebaseConfig = require('./config/firebase');
 const express = require('express');
 const cors = require('cors');
 const connection = require('./config/db');
+initializeApp(firebaseConfig);
+
+const categoryRoute = require('./routes/categoryRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -9,6 +14,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
+
+app.use('/category', categoryRoute);
 
 app.listen(PORT, () => {
     connection();
