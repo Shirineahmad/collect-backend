@@ -9,7 +9,7 @@ const userSchema = new Schema({
   },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phoneNumber: { type: Number, required: true,unique:true },
+  phoneNumber: { type: Number, required: true, unique: true },
   city: { type: String },
   fullAddress: {
     street: { type: String },
@@ -19,12 +19,12 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["admin", "seller", "client"],required:true
+    enum: ["admin", "seller", "client"], required: true, default: 'client'
   },
- 
-},
-{timestamps:true});
 
-const UserModel = model('UserModels', userSchema);
+},
+  { timestamps: true });
+
+const UserModel = model('users', userSchema);
 
 module.exports = UserModel;
