@@ -11,6 +11,7 @@ const categoryRoute = require('./routes/categoryRoutes');
 const cartRoute = require('./routes/cartRoutes');
 const wishlistRoute = require('./routes/wishlistRoutes');
 const productRoute = require('./routes/productRoutes');
+const orderRoute = require('./routes/orderRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,9 +23,9 @@ app.use(express.urlencoded());
 app.use('/user',userRoutes);
 app.use('/category', categoryRoute);
 app.use('/cart', cartRoute);
-
 app.use('/wishlist', wishlistRoute);
 app.use('/product', productRoute);
+app.use('/order', orderRoute);
 
 
 app.listen(PORT, () => {
