@@ -8,6 +8,7 @@ initializeApp(firebaseConfig);
 
 const userRoutes = require('./routes/userRoutes');
 const categoryRoute = require('./routes/categoryRoutes');
+const cartRoute = require('./routes/cartRoutes');
 const wishlistRoute = require('./routes/wishlistRoutes');
 const productRoute = require('./routes/productRoutes');
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded());
 
 app.use('/user',userRoutes);
 app.use('/category', categoryRoute);
+app.use('/cart', cartRoute);
 
 app.use('/wishlist', wishlistRoute);
 app.use('/product', productRoute);
