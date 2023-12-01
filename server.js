@@ -8,7 +8,7 @@ initializeApp(firebaseConfig);
 
 const userRoutes = require('./routes/userRoutes');
 const categoryRoute = require('./routes/categoryRoutes');
-
+const bannerRoute = require('./routes/bannerRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +19,7 @@ app.use(express.urlencoded());
 
 app.use('/user',userRoutes);
 app.use('/category', categoryRoute);
+app.use('/banner', bannerRoute);
 
 app.listen(PORT, () => {
     connection();
