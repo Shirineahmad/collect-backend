@@ -53,7 +53,6 @@ const createOrderFromCart = async (req, res) => {
     }
 };
 
-
 const deleteById = async (req, res) => {
     try {
         const { orderID } = req.params;

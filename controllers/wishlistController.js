@@ -3,39 +3,39 @@ const User = require('../models/userModel');
 const Product = require('../models/productModel');
 
 const createWishlist = async (req, res) => {
-    try {
-      const { userID } = req.body;
-      console.log('Received request body:', req.body);
-  
-      const userExists = await User.findById(userID);
-  
-      if (!userExists) {
-        return res.status(404).json({
-          success: false,
-          message: `User with id ${userID} isn't registered`,
-        });
-      }
-  
-      const newWishlist = new Wishlist({
-        userId: userID,
-        productIds: [],
-      });
-  
-      await newWishlist.save();
-  
-      res.status(200).json({
-        success: true,
-        message: 'Wishlist created successfully',
-        data: newWishlist,
-      });
-    } catch (error) {
-      res.status(500).json({
+  try {
+    const { userID } = req.body;
+    console.log('Received request body:', req.body);
+
+    const userExists = await User.findById(userID);
+
+    if (!userExists) {
+      return res.status(404).json({
         success: false,
-        message: 'Unable to create wishlist',
-        error: error.message,
+        message: `User with id ${userID} isn't registered`,
       });
     }
-  };
+
+    const newWishlist = new Wishlist({
+      userId: userID,
+      productIds: [],
+    });
+
+    await newWishlist.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Wishlist created successfully',
+      data: newWishlist,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Unable to create wishlist',
+      error: error.message,
+    });
+  }
+};
 
 const getByUserID = async (req, res) => {
   try {
@@ -86,6 +86,13 @@ const addProductToWishlist = async (req, res) => {
       });
     }
 
+    if (wishlist.productIds.includes(productID)) {
+      return res.status(401).json({
+        success: false,
+        message: `Product with id ${productID} already exists in your wishlist`,
+      });
+    }
+
     wishlist.productIds.push(productID);
     await wishlist.save();
 
@@ -113,6 +120,13 @@ const removeProductFromWishlist = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: `No wishlist with id ${req.params.wishlistID} available`,
+      });
+    }
+
+    if (!wishlist.productIds.includes(productID)) {
+      return res.status(401).json({
+        success: false,
+        message: `Product with id ${productID} not found in your wishlist`,
       });
     }
 

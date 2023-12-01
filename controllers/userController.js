@@ -50,7 +50,6 @@ const register = async (req, res) => {
     !email ||
     !password ||
     !phoneNumber
-
   ) {
     return res.status(401).json({ message: "All fields are required" });
   }
