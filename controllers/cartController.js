@@ -78,6 +78,13 @@ const addProductToCart = async (req, res) => {
             });
         }
 
+        if (productExists.status === 'sold') {
+            return res.status(401).json({
+                success: false,
+                message: `Product ${productExists.name} is already sold`,
+            });
+        }
+
         const cart = await Cart.findOne({ _id: req.params.cartID });
 
         if (!cart) {
@@ -89,10 +96,10 @@ const addProductToCart = async (req, res) => {
 
         if (cart.productIds.includes(productID)) {
             return res.status(401).json({
-              success: false,
-              message: `Product with id ${productID} already exists in your cart`,
+                success: false,
+                message: `Product with id ${productID} already exists in your cart`,
             });
-          }
+        }
 
         const productPrice = productExists.discountPercentage
             ? productExists.price - (productExists.price * productExists.discountPercentage) / 100
@@ -115,6 +122,7 @@ const addProductToCart = async (req, res) => {
         });
     }
 };
+
 
 const removeProductFromCart = async (req, res) => {
     try {
