@@ -1,6 +1,9 @@
 const Users = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { generateToken } = require('../extra/generateToken');
+const { getAuth, confirmPasswordReset, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, isEmailVerified, sendPasswordResetEmail } = require('firebase/auth');
+const auth = getAuth();
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -22,6 +25,24 @@ const login = async (req, res) => {
         message: `password is  wrong`,
       });
     }
+
+    await signInWithEmailAndPassword(auth, email, password);
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+          return res.status(400).json({
+              success: false,
+              message: `No authenticated user found.`,
+          });
+      }
+
+      if (!currentUser.emailVerified) {
+          return res.status(400).json({
+              success: false,
+              message: `Email not verified. Please check your email for verification.`,
+          });
+      }
+
    
     res.status(200).json({
       success: true,
@@ -41,28 +62,35 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const { fullName, email, password, phoneNumber, city, fullAddress, role } =
-    req.body;
+  const {
+    fullName,
+    email,
+    password,
+    phoneNumber,
+    city,
+    fullAddress,
+    role
+  } = req.body;
   const hashpwd = await bcrypt.hash(password, 10);
 
-  if (
-    !fullName ||
-    !email ||
-    !password ||
-    !phoneNumber
-  ) {
-    return res.status(401).json({ message: "All fields are required" });
+  if (!fullName || !email || !password || !phoneNumber) {
+    return res.status(401).json({
+      message: "All fields are required"
+    });
   }
 
-  const duplicate = await Users.findOne({ email });
+  const duplicate = await Users.findOne({
+    email
+  });
 
   if (duplicate) {
-    return res
-      .status(409)
-      .json({ message: `email ${email} already has account ` });
+    return res.status(409).json({
+      message: `email ${email} already has an account `
+    });
   }
+
   try {
-    const result = await Users.create({
+    const newUser = new Users({
       fullName: {
         firstName: fullName.firstName,
         lastName: fullName.lastName,
@@ -80,21 +108,92 @@ const register = async (req, res) => {
       role: role || "client",
     });
 
+    await newUser.save();
+
+    const firebaseUser = await createUserWithEmailAndPassword(auth, newUser.email, password);
+
+    newUser.firebaseUid = firebaseUser.user.uid;
+    await newUser.save();
+
+    await sendEmailVerification(auth.currentUser);
+
     res.status(200).json({
       success: true,
-      message: `user ${email} register successfully`,
-      data: result,
-      token:generateToken(result._id,result.role)
+      message: 'User added successfully. Please check your email for verification.',
+      token: generateToken(newUser._id, newUser.role),
+      data: newUser,
     });
-  } catch (err) {
-    return res.status(400).json({
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      return res.status(409).json({
+        success: false,
+        message: `Email ${newUser.email} is already in use. Please log in or recover your account.`,
+      });
+    }
+
+    res.status(400).json({
       success: false,
-      message: ` failed to register thr user ${fullName}`,
-      err: err.message,
+      message: 'Error while trying to register a new user.',
+      error: error.message,
     });
   }
 };
 
+const sendResetEmail = async (req, res) => {
+  const {
+    email
+  } = req.body;
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    res.status(200).json({
+      success: true,
+      message: 'Password reset email sent successfully. Please check your email.',
+    });
+  } catch (error) {
+    console.error('Error sending password reset email:', error.message);
+    res.status(400).json({
+      success: false,
+      message: 'Error sending password reset email.',
+      error: error.message,
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  let { oobCode, newPassword } = req.body;
+
+  if (!oobCode) {
+    const refererUrl = req.get('referer'); 
+
+    if (refererUrl) {
+      const url = new URL(refererUrl);
+      oobCode = url.searchParams.get('oobCode');
+    }
+  }
+
+  try {
+    if (!oobCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'No oobCode provided. Unable to reset password.',
+      });
+    }
+
+    await confirmPasswordReset(auth, oobCode, newPassword);
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successful.',
+    });
+  } catch (error) {
+    console.error('Error resetting password:', error.message);
+    res.status(400).json({
+      success: false,
+      message: 'Error resetting password.',
+      error: error.message,
+    });
+  }
+};
 const getByID = async (req, res) => {
   const ID = req.params.ID;
   try {
@@ -188,4 +287,4 @@ const update = async (req, res) => {
   }
 };
 
-module.exports = { register, getByID, getAll, deleteById, update, login };
+module.exports = { register, getByID, getAll, deleteById, update, login, sendResetEmail, resetPassword };

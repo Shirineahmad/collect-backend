@@ -21,7 +21,7 @@ const userSchema = new Schema({
     type: String,
     enum: ["admin", "seller", "client"], required: true, default: 'client'
   },
-
+  firebaseUid: { type: String },
 },
   { timestamps: true });
 
