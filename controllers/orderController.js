@@ -1,6 +1,7 @@
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
 const Order = require('../models/orderModel');
+const {sendOrderNotificationEmailToOwner, sendOrderConfirmationEmailToClient} = require ('../extra/sendEmails')
 
 const createOrderFromCart = async (req, res) => {
     try {
@@ -13,6 +14,13 @@ const createOrderFromCart = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: `No cart found with id ${cartID}`,
+            });
+        }
+
+        if (cart.productIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot checkout with an empty cart',
             });
         }
 
@@ -39,6 +47,9 @@ const createOrderFromCart = async (req, res) => {
         cart.totalPrice = 0;
         await cart.save();
 
+        await sendOrderConfirmationEmailToClient(order);
+        await sendOrderNotificationEmailToOwner(order);
+
         res.status(200).json({
             success: true,
             message: 'Order created successfully',
@@ -52,6 +63,8 @@ const createOrderFromCart = async (req, res) => {
         });
     }
 };
+
+
 
 const deleteById = async (req, res) => {
     try {
