@@ -362,7 +362,7 @@ const getAllByCategoryName = async (req, res) => {
       });
     }
 
-    const products = await Product.find({ categoryID: existingCategory._id });
+    const products = await Product.find({ categoryID: existingCategory._id }).exec();
 
     if (products.length === 0) {
       return res.status(404).json({
