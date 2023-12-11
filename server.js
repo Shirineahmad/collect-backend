@@ -13,7 +13,7 @@ const cartRoute = require('./routes/cartRoutes');
 const wishlistRoute = require('./routes/wishlistRoutes');
 const productRoute = require('./routes/productRoutes');
 const orderRoute = require('./routes/orderRoutes');
-
+const emailRoute = require('./routes/emailRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,7 +29,7 @@ app.use('/cart', cartRoute);
 app.use('/wishlist', wishlistRoute);
 app.use('/product', productRoute);
 app.use('/order', orderRoute);
-
+app.use('/email', emailRoute);
 
 app.listen(PORT, () => {
     connection();

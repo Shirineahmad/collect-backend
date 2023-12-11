@@ -4,11 +4,11 @@ const { Schema, model } = mongoose;
 const cartSchema = new Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true, unique: true },
     productIds: [
-        { type: mongoose.Schema.Types.ObjectId, ref: 'product', required: true, unique: true }
+        { type: mongoose.Schema.Types.ObjectId, ref: 'product', required: true }
     ],
     totalPrice: { type: Number, required: true },
 },
- { timestamps: true } 
+    { timestamps: true }
 );
 
 const cart = model('cart', cartSchema);

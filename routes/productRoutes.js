@@ -10,7 +10,7 @@ const {
     update,
     deleteById,
     addImageToArray,
-    getWithPagination,
+    // getWithPagination,
     removeImageFromArray,
     getAllByCategoryID,
     getAllByCategoryName,
@@ -21,7 +21,7 @@ router.post('/add', upload.array('images', 6), isAuthenticated(['admin', 'seller
 router.delete('/delete/:ID', isAuthenticated(['admin', 'seller']), deleteById);
 router.get('/getById/:ID', getByID);
 router.get('/getAll', getAll);
-router.get("/paginate?", getWithPagination);
+// router.get("/paginate?", getWithPagination);
 router.put('/update/:ID', upload.array('images', 6), isAuthenticated(['admin', 'seller']), update);
 router.post('/addImage', upload.single('image'), isAuthenticated(['admin', 'seller']), addImageToArray);
 router.post('/removeImage', isAuthenticated(['admin', 'seller']), removeImageFromArray);
