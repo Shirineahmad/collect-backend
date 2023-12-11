@@ -81,48 +81,49 @@ const getAll = async (_, res) => {
     });
   }
 };
-const getWithPagination = async (req, res) => {
-  let page = parseInt(req.query.page) || 1;
-  let limit = parseInt(req.query.limit) || 10;
 
-  // Validate page and limit
-  if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid page or limit parameters",
-    });
-  }
+// const getWithPagination = async (req, res) => {
+//   let page = parseInt(req.query.page) || 1;
+//   let limit = parseInt(req.query.limit) || 10;
 
-  try {
-    const products = await Product.find({})
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .exec();
+//   // Validate page and limit
+//   if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+//     return res.status(400).json({
+//       success: false,
+//       message: "Invalid page or limit parameters",
+//     });
+//   }
 
-    // You might want to fetch the total count for pagination info
-    const totalCount = await Product.countDocuments();
+//   try {
+//     const products = await Product.find({})
+//       .limit(limit)
+//       .skip((page - 1) * limit)
+//       .exec();
 
-    const totalPages = Math.ceil(totalCount / limit);
+//     // You might want to fetch the total count for pagination info
+//     const totalCount = await Product.countDocuments();
 
-    res.status(200).json({
-      success: true,
-      products,
-      page,
-      limit,
-      totalPages,
-      totalCount,
-    });
+//     const totalPages = Math.ceil(totalCount / limit);
 
-    console.log(products);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: `Unable to get pagination`,
-      error: error.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       products,
+//       page,
+//       limit,
+//       totalPages,
+//       totalCount,
+//     });
+
+//     console.log(products);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: `Unable to get pagination`,
+//       error: error.message,
+//     });
+//   }
+// };
 
 const getByID = async (req, res) => {
   try {
@@ -395,5 +396,5 @@ module.exports = {
   removeImageFromArray,
   getAllByCategoryID,
   getAllByCategoryName,
-  getWithPagination,
+  // getWithPagination,
 };

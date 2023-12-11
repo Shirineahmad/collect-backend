@@ -1,7 +1,7 @@
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
 const Order = require('../models/orderModel');
-const {sendOrderNotificationEmailToOwner, sendOrderConfirmationEmailToClient} = require ('../extra/sendEmails')
+const { sendOrderNotificationEmailToOwner, sendOrderConfirmationEmailToClient } = require('../extra/sendEmails')
 
 const createOrderFromCart = async (req, res) => {
     try {
@@ -32,7 +32,7 @@ const createOrderFromCart = async (req, res) => {
         const selectedShippingMethod = shippingMethod || defaultShippingMethod;
 
         const order = new Order({
-            userId: cart.userId, 
+            userId: cart.userId,
             productIds: cart.productIds,
             totalPrice: cart.totalPrice + (selectedShippingMethod === 'delivery' ? 3 : 0),
             status: 'pending',
@@ -63,8 +63,6 @@ const createOrderFromCart = async (req, res) => {
         });
     }
 };
-
-
 
 const deleteById = async (req, res) => {
     try {
@@ -152,9 +150,54 @@ const getById = async (req, res) => {
     }
 };
 
+const getAll = async (_, res) => {
+    try {
+        const orders = await Order.find({});
+        res.status(200).json({
+            success: true,
+            message: `Orders' data retrieved successfully`,
+            data: orders,
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: `Unable to get orders' data`,
+            error: error,
+        });
+    }
+};
+
+const getOrdersByUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const orders = await Order.find({ userId: userId });
+
+        if (orders.length > 0) {
+            res.status(200).json({
+                success: true,
+                message: `Orders for user with ID ${userId} retrieved successfully`,
+                data: orders,
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: `No orders found for user with ID ${userId}`,
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: `Unable to get orders for the user with ID ${userID}`,
+            error: error.message,
+        });
+    }
+};
+
 module.exports = {
     createOrderFromCart,
     deleteById,
     updateById,
     getById,
+    getAll,
+    getOrdersByUser,
 }

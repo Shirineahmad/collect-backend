@@ -97,7 +97,7 @@ const addProductToCart = async (req, res) => {
         if (cart.productIds.includes(productID)) {
             return res.status(401).json({
                 success: false,
-                message: `Product with id ${productID} already exists in your cart`,
+                message: `${productExists.name} already exists in your cart`,
             });
         }
 

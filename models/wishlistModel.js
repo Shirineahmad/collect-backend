@@ -4,7 +4,7 @@ const { Schema, model } = mongoose;
 const wishlistSchema = new Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true, unique: true },
     productIds: [
-        { type: mongoose.Schema.Types.ObjectId, ref: 'product', required: true, unique: true }
+        { type: mongoose.Schema.Types.ObjectId, ref: 'product', required: true }
     ],
 });
 
