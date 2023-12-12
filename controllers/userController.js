@@ -245,7 +245,7 @@ const getAll = async (req, res) => {
 const deleteById = async (req, res) => {
   const ID = req.params.ID;
   try {
-    const result = await Users.deleteOne({ ID });
+    const result = await Users.deleteOne({ _id: ID });
     res.status(200).json({
       success: true,
       message: `delete user with id ${ID} successfully`,
