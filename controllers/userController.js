@@ -258,6 +258,7 @@ const deleteById = async (req, res) => {
     });
   }
 };
+
 const update = async (req, res) => {
   const ID = req.params.ID;
   
@@ -280,9 +281,9 @@ const update = async (req, res) => {
     });
   } catch (err) {
     return res.status(400).json({
-      success: true,
+      success: false,
       message: `unable to update id ${ID}`,
-      data: result,
+      err: err.message,
     });
   }
 };
