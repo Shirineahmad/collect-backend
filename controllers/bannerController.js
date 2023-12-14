@@ -64,60 +64,60 @@ const getBanners = async (_, res) => {
 }
 
 const update = async (req, res) => {
-    const { text, textButton, link } = req.body;
-    const bannerID = req.params.ID;
+  const { text, textButton, link } = req.body;
+  const bannerID = req.params.ID;
 
-    try {
-        const file = req.file;
-        let image = req.body.image; 
-        if (file) {
-            const uploadedFile = await FileUpload(file);
-            image = uploadedFile.downloadURL; 
-        }
+  try {
+    const existingBanner = await Banner.findById(bannerID);
 
-        if (!text || !textButton || !link) {
-            return res.status(400).json({
-                success: false,
-                message: 'All 3 fields are mandatory',
-            });
-        }
+    const bannerData = {};
 
-        if (textButton.length > 25) {
-            return res.status(400).json({
-                success: false,
-                message: 'The button text must be a maximum of 25 characters',
-            });
-        }
-
-        const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
-        if (!urlRegex.test(link)) {
-            return res.status(401).json({
-                success: false,
-                message: 'Provide a link with valid URL format',
-            });
-        }
-
-        const bannerData = {
-            text,
-            textButton,
-            link,
-            image,
-            highlighted: highlighted || false,
-        };
-
-        const banner = await Banner.findByIdAndUpdate(bannerID, bannerData);
-        res.status(200).json({
-            success: true,
-            message: 'Banner data updated successfully',
-            data: banner,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: 'Unable to update data',
-            error: error,
-        });
+    if (text && text !== existingBanner.text) {
+      bannerData.text = text;
     }
+
+    if (textButton && textButton !== existingBanner.textButton) {
+      if (textButton.length > 25) {
+        return res.status(400).json({
+          success: false,
+          message: "The button text must be a maximum of 25 characters",
+        });
+      }
+      bannerData.textButton = textButton;
+    }
+
+    if (link && link !== existingBanner.link) {
+      const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+      if (!urlRegex.test(link)) {
+        return res.status(401).json({
+          success: false,
+          message: "Provide a link with valid URL format",
+        });
+      }
+      bannerData.link = link;
+    }
+
+    const file = req.file;
+    let image = req.body.image;
+    if (file) {
+      const uploadedFile = await FileUpload(file);
+      image = uploadedFile.downloadURL;
+      bannerData.image = image;
+    }
+
+    const banner = await Banner.findByIdAndUpdate(bannerID, bannerData);
+    res.status(200).json({
+      success: true,
+      message: "Banner data updated successfully",
+      data: banner,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Unable to update data",
+      error: error,
+    });
+  }
 };
 
 module.exports = { create, getBanners, update }
