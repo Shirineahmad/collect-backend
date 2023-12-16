@@ -92,14 +92,12 @@ const deleteById = async (req, res) => {
 const updateById = async (req, res) => {
     try {
         const { orderID } = req.params;
-        const { status, shippingMethod, shippingFee, paymentMethod } = req.body;
+        const { status } = req.body;
 
         const updatedFields = {};
 
         if (status) updatedFields.status = status;
-        if (shippingMethod) updatedFields.shippingMethod = shippingMethod;
-        if (shippingFee) updatedFields.shippingFee = shippingFee;
-        if (paymentMethod) updatedFields.paymentMethod = paymentMethod;
+        
 
         const updatedOrder = await Order.findByIdAndUpdate(orderID, updatedFields, { new: true });
 
