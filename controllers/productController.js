@@ -386,6 +386,62 @@ const getAllByCategoryName = async (req, res) => {
   }
 };
 
+const updateDiscountByCategoryID = async (req, res) => {
+  try {
+    const { categoryID } = req.params;
+    const { discountPercentage } = req.body;
+
+    
+    if (typeof discountPercentage !== 'number' || discountPercentage < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid discount percentage provided',
+      });
+    }
+
+    const existingCategory = await Category.findById(categoryID);
+
+    if (!existingCategory) {
+      return res.status(404).json({
+        success: false,
+        message: `Category with ID ${categoryID} does not exist`,
+      });
+    }
+
+    const productsToUpdate = await Product.find({
+      categoryID,
+      status: { $ne: 'sold' }, 
+    });
+
+    if (productsToUpdate.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No products found for the category with ID ${categoryID} or all products are sold out`,
+      });
+    }
+
+    const updatedProducts = await Promise.all(
+      productsToUpdate.map(async (product) => {
+        product.discountPercentage = discountPercentage;
+        return await product.save();
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Discount updated successfully for products in category with ID ${categoryID}`,
+      data: updatedProducts,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Unable to update discount for products in the category',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAll,
   getByID,
@@ -396,5 +452,6 @@ module.exports = {
   removeImageFromArray,
   getAllByCategoryID,
   getAllByCategoryName,
+  updateDiscountByCategoryID
   // getWithPagination,
 };

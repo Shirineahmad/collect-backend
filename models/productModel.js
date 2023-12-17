@@ -22,7 +22,7 @@ const productSchema = new Schema({
     price: { type: Number, required: true },
     status: {
         type: String,
-        enum: ['available', 'sold out'],
+        enum: ['available', 'sold'],
         required: true
     },
     discountPercentage: { type: Number },

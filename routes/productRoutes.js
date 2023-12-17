@@ -14,6 +14,7 @@ const {
     removeImageFromArray,
     getAllByCategoryID,
     getAllByCategoryName,
+    updateDiscountByCategoryID,
 } = require('../controllers/productController');
 const isAuthenticated = require("../middlewares/auth");
 
@@ -27,5 +28,6 @@ router.post('/addImage', upload.single('image'), isAuthenticated(['admin', 'sell
 router.post('/removeImage', isAuthenticated(['admin', 'seller']), removeImageFromArray);
 router.get('/category/:categoryID', getAllByCategoryID);
 router.get('/categoryByName/:categoryName', getAllByCategoryName);
+router.post('/updateDiscountByCategoryID/:categoryID',isAuthenticated(['admin', 'seller']), updateDiscountByCategoryID);
 
 module.exports = router;
