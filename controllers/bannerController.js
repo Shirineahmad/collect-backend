@@ -1,5 +1,59 @@
 const Banner = require('../models/bannerModel');
-const { FileUpload } = require('../extra/imageUploader')
+const { FileUpload } = require('../extra/imageUploader');
+const { trusted } = require('mongoose');
+
+const setBannerhiglighted = async (req, res) => {
+  try {
+    const bannerID = req.params.ID;
+    const { higlighted } = req.body;
+    console.log(higlighted);
+    console.log(`Received higlighted: ${bannerID},${higlighted}`);
+
+    // Use findByIdAndUpdate to update the document
+    const updatedBanner = await Banner.findByIdAndUpdate(
+      { _id: bannerID },
+      { $set: { higlighted: higlighted } },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedBanner) {
+      return res.status(404).json({
+        success: false,
+        message: "Banner not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Banner updated successfully",
+      banner: updatedBanner,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Unable to update data",
+      error: error,
+    });
+  }
+};
+const getHiglightedBanners = async (_, res) => {
+  try {
+    const banner = await Banner.find({ higlighted: true });
+    console.log(banner); // Move the logging here
+    res.status(200).json({
+      success: true,
+      message: "Banner data retrieved successfully",
+      data: banner,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Unable to get banner data",
+      error: error.message,
+    });
+  }
+};
+
 
 const create = async (req, res) => {
     try {
@@ -120,4 +174,5 @@ const update = async (req, res) => {
   }
 };
 
-module.exports = { create, getBanners, update }
+
+module.exports = { create, getBanners, update, setBannerhiglighted, getHiglightedBanners};
